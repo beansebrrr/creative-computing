@@ -81,14 +81,14 @@ Comments:
 
 Oh boy, I have a lot of explaining to do.
 
-2.  I wanted to emulate a 'do-while' loop which I used when coding in C.
+1.  I wanted to emulate a 'do-while' loop which I used when coding in C.
     It looked like the closest I could get was using 'while True', and use
     'break' once the condition has been met. In this case, I made the
     program repeatedly ask for an input as long as the input isn't valid.
     I eventually used this knowledge to improve my code in Exercise 3:
     Biography.
 
-1.  After reading about it some more, I found some ways to combat the
+2.  After reading about it some more, I found some ways to combat the
     'input()' function's nature of always returning a string. I learned
     how to use the 'try-except' blocks. See line 41 and line 58. The
     program will first attempt to turn the user's input into an int,
