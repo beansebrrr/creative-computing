@@ -4,6 +4,7 @@ Exercise 2: Simple Sums
 
 This exercise takes the numbers '8' and '10', and adds them together
 """
+
 # We have to declare two variables with the values 8 and 10 respectively.
 # For this exercise, I will label them as 'num1' and 'num2'
 num1 = 8

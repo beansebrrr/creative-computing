@@ -7,7 +7,8 @@ really make the code look messy. I hope it looks understandable
 enough, though.
 """
 
-password = "12345"  # Initializing the important variables.
+# Initializing the important variables.
+password = "12345"
 attempts = 5
 
 while attempts > 0:

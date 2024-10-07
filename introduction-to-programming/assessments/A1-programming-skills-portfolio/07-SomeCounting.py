@@ -97,10 +97,27 @@ Comments:
     run the program, we can decide which loop we'd like to be 
     demonstrated.
 
-5.  From line 55, I initially wanted to use something similar to
+5.  At line 55, I initially wanted to use something similar to
     "switch statements", so that I didn't have to use "elif" multiple
     times. There seemed to be an existing "match" and "case" function
     in more recent versions of Python, however, I skipped on using it
     because I had concerns regarding compatibility, since match-case
     was only introduced since Python 3.10
+
+For those curious, I would've made the match-case version like so by replacing lines 55-67 with:
+
+match count:
+    case "1":
+        oneToFifty()
+    case "2":
+        fiftyToOne()
+    case "3":
+        thirtyToFifty()
+    case "4":
+        fiftyToTen()
+    case "5":
+        oneHundredToTwoHundred()
+    case _:
+        print("\n$=======o No valid input detected. Exited. o=======$\n")
+        isValid = False
 """
