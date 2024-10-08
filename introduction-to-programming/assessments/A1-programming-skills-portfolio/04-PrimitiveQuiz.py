@@ -6,23 +6,28 @@ Here's a quiz about the capitals of different European countries.
 This might be my best work so far.
 """
 
-# This is a separate function to check for the correct answer. This is to avoid copy-pasting.
-def check(response):
-    global score    # ensures that it uses the 'score' variable outside the function.
-    
-    if str.lower(response) == answerKey:    # I use an if-else statement in comparing the two strings.
-        print("Correct!\n")                 # The 'str.lower' function is used to remove capilatization sensitiveness.
-        score += 1                          # if the answer is correct, add 1 to 'score'.
+# This is a separate function to ask the question and
+# check the answers. This is to avoid copy-pasting.
+def ask(country, capital):
+    global score    # Modifies the score variable from outsize the function
+    response = input(f"What is the capital of {country}? ")
+
+    if str.lower(response) == capital:  # I use an if-else statement in comparing the two strings.
+        print("Correct!\n")             # The 'str.lower' function is used to remove caps-sensitiveness.
+        score += 1
         return
-    print(f"Wrong. The correct answer is {str.capitalize(answerKey)}.\n")   # using 'str.capitalize' for aesthetic purposes
+    print(f"Wrong. The correct answer is {str.capitalize(capital)}.\n")   # using 'str.capitalize' for aesthetic purposes
 
-score = 0   # Initializing score variable. I'm making a score counter for fun!
+def quiz():
+    global score
+    score = 0   # Initializing score variable. I'm making a score counter for fun!
 
-# This is a makeshift introduction screen.
-# I learned here that triple quotes are NOT limited to comments.
-# This is actually amazing.
-input("""$==========o Let's have a little Quiz! o==========$
-      
+    # This is a makeshift introduction screen.
+    # I learned here that triple quotes are NOT limited to comments.
+    # This is actually amazing.
+    input("""
+$==========o Let's have a little Quiz! o==========$
+        
 I will ask you 10 questions about the capitals of
 countries around Europe, and if you get 5 points
 and above, you pass! Don't worry, your answers
@@ -31,51 +36,33 @@ won't to be case sensitive. Anyways, are you ready?
 $============o Press Enter to begin. o============$
 """)
 
-question = input("What is the capital of Norway? ") # 'question' asks for an input from the user.
-answerKey = "oslo"                                  # 'answerKey' is set to the correct answer of the question.
-check(question)                                     # 'check' function is called, inserting the input variable.
+    # Is a dict with the country as the key, and capital as the value.
+    CountriesAndCapitals = {
+        "Norway" : "oslo",
+        "France" : "paris",
+        "The United Kingdom" : "london",
+        "The Netherlands" : "amsterdam",
+        "Switzerland" : "bern",
+        "Germany" : "berlin",
+        "Austria" : "vienna",
+        "Poland" : "warsaw",
+        "Sweden" : "stockholm",
+        "Belgium" : "brussels"
+    }
 
-question = input("What is the capital of France? ")
-answerKey = "paris"
-check(question)
+    # Loops through the key-value pairs in CountriesAndCapitals and uses
+    # them as variables to the ask() function
+    for country, capital in CountriesAndCapitals.items():
+        ask(country, capital)
 
-question = input("What is the capital of the United Kingdom? ")
-answerKey = "london"
-check(question)
+    # Prints an appropriate response upon completing the quiz.
+    if score > 4:
+        print(f"Congratulations! You passed with score of {score}/10.")
+    else:
+        print(f"Aww, you got {score}/10. Let's do better next time!")
 
-question = input("What is the capital of the Netherlands? ")
-answerKey = "amsterdam"
-check(question)
-
-question = input("What is the capital of Switzerland? ")
-answerKey = "bern"
-check(question)
-
-question = input("What is the capital of Germany? ")
-answerKey = "berlin"
-check(question)
-
-question = input("What is the capital of Austria? ")
-answerKey = "vienna"
-check(question)
-
-question = input("What is the capital of Poland? ")
-answerKey = "warsaw"
-check(question)
-
-question = input("What is the capital of Sweden? ")
-answerKey = "stockholm"
-check(question)
-
-question = input("What is the capital of Belgium? ")
-answerKey = "brussels"
-check(question)
-
-# Prints an appropriate response upon completing the quiz.
-if score > 4:
-    print(f"Congratulations! You passed with score of {score}/10.")
-else:
-    print(f"Aww, you got {score}/10. Let's do better next time!")
+if __name__ == "__main__":
+    quiz()
 
 
 """
