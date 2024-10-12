@@ -4,10 +4,17 @@ Exercise 10: Is it Even
 
 int main(void) part 2
 """
+
 def isEven(j):  # Bool function, will explain below.
     if (j % 2 == 0):
         return True
     return False
+
+def isPrime(j):
+    for i in range(2, j):
+        if j % i == 0:
+            return False
+    return True
 
 def main():
     num = input("Please input a number: ")
@@ -18,10 +25,15 @@ def main():
         except ValueError:
             num = input("Please input a number: ")
     
-    if isEven(num) == True:
-        print(f"\n{num} is an Even number!\n")
-        return
-    print(f"\n{num} is an Odd number!\n")
+    if isEven(num):
+        print(f"\n{num} is an Even number!")
+    else:
+        print(f"\n{num} is an Odd number!")
+    
+    if isPrime(num):
+        print(f"{num} is also a Prime number!\n")
+    else:
+        print(f"{num} is not a Prime number!\n")
 
 if __name__ == "__main__":
     main()
@@ -40,4 +52,7 @@ by 2, I use the modulo operator to check ifor a remainder. If
 the remainder is 0, then it returns True, hence, it's an even
 number. Otherwise, it'll return false, meaning it's an odd
 number.
+
+I added a new 'isPrime' function, which uses the same modulo
+operator as 'isEven', but in a different application.
 """
