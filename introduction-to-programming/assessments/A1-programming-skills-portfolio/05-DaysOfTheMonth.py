@@ -39,14 +39,16 @@ month = input("Give me the number of a month (e.g. '1' for January): ")
 
 while True: # Detects for a valid output to avoid errors.
     try:
-        month = int(month)          # Tries to turn the input into an int
-        if (month in range(1,13)):  # If 'month' is between 1 to 12, exits the loop and continues.
+        month = int(month)          # Turns the input into an int
+        if (month >= 1 and month <= 12):  # If 'month' is between 1 to 12, exits the loop and continues.
             break
     except ValueError:
-        print("That's not an integer, dummy.")  
+        print("Please type in numbers only, you dummy.")  
     month = input("Give me the number of a month (e.g. '1' for January): ") # If it doesn't work, reprompts the user.
 
-if (month == 2):    # If the month given is 2, therefore february, this function takes leap years into account.
+# If the month given is 2, therefore february, this part of the
+# code takes leap years into account.
+if (month == 2):    
     leap = input("""
 On leap years, February has 29 days. To take this into account, please type Y if it
 is a leap year, and N if it isn't. If you don't know, you may simply type what year
@@ -58,13 +60,13 @@ it is, and I will do the calculation for you.
         try:
             leap = int(leap)            # If the user inputs a number, determines whether it is a leap year.
             if (leap % 4 == 0):         # A leap year is a year which is divisible by 4.
-                daysInAMonth[2] = 29    # If the remainder of 'year' divided by 4 is equal to 0, it changes the number of days in February to 29.
+                daysInAMonth[2] = 29    # If year is divisible by 4, sets february's days to 29.
             break
         except ValueError:
-            if (str.lower(leap) == "y"):    # Detects if the user had typed Y or N.
-                daysInAMonth[2] = 29        # str.lower is used to remove case-sensitiveness.
+            if (leap.lower() == "y"):   # Detects if the user had typed Y or N.
+                daysInAMonth[2] = 29    # str.lower is used to remove case-sensitiveness.
                 break
-            elif (str.lower(leap) == "n"):
+            elif (leap.lower() == "n"):
                 break
         leap = input("\nPlease type Y if it's a leap year, or N if it isn't.\nOr you can type what year it is, and I'll do the rest: ")
     
@@ -90,7 +92,7 @@ Oh boy, I have a lot of explaining to do.
 
 2.  After reading about it some more, I found some ways to combat the
     'input()' function's nature of always returning a string. I learned
-    how to use the 'try-except' blocks. See line 41 and line 58. The
+    how to use the 'try-except' blocks. See line 40 and line 59. The
     program will first attempt to turn the user's input into an int,
     but if it returns an error, it skips that and runs the code under
     the 'except' block.

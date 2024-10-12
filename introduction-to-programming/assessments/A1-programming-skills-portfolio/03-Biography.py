@@ -31,7 +31,6 @@ Hometown: {biography['hometown']}
 Age: {biography['age']}
 """)
 
-
 """
 There's another way to print multiple lines with a single
 print statement, and that's simply to type "\n" to indicate

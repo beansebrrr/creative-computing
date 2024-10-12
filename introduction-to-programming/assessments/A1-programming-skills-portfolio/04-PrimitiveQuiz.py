@@ -12,11 +12,11 @@ def ask(country, capital):
     global score    # Modifies the score variable from outsize the function
     response = input(f"What is the capital of {country}? ")
 
-    if str.lower(response) == capital:  # I use an if-else statement in comparing the two strings.
+    if response.lower() == capital:  # I use an if-else statement in comparing the two strings.
         print("Correct!\n")             # The 'str.lower' function is used to remove caps-sensitiveness.
         score += 1
         return
-    print(f"Wrong. The correct answer is {str.capitalize(capital)}.\n")   # using 'str.capitalize' for aesthetic purposes
+    print(f"Wrong. The correct answer is {capital.capitalize()}.\n")   # using 'str.capitalize' for aesthetic purposes
 
 def quiz():
     global score
