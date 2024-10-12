@@ -5,11 +5,12 @@ Exercise 9: Hello
 int main(void) :)
 """
 
-def hello():    # I'll make this function print hello
-    print("Hello")
+def hello(name = None):  # I'll make this function print hello
+    print("Hello", name)
 
 def main():     # main() will call hello()
-    hello()
+    name = input("What is your name? (Input blank if you want to skip): ")
+    hello(name)
 
 if __name__ == "__main__":  # runs main()
     main()
