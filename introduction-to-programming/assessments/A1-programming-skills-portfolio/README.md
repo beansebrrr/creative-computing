@@ -1,6 +1,6 @@
 
 # Assessment 1: Programming Skills Portfolio
-This portfolio contains 10 exercises showcasing the things I've learned thus far. Additionally, I have taken and completed Sololearn's [Introduction to Python](https://www.sololearn.com/en/learn/courses/python-introduction) course.
+This portfolio contains 10 exercises showcasing the projects and programs I've created for this assessment. Below is my thought process from when I was coding these programs, highlighting my hurdles and solutions to these problems.
 
 ## Exercise 1: Coding is Cool
 [View Source Code](https://github.com/beansebrrr/creative-computing/blob/main/introduction-to-programming/assessments/A1-programming-skills-portfolio/01-CodingIsCool.py)
@@ -57,9 +57,9 @@ This is the first proper introduction to *for loops* and additionally, the `rang
 ## Exercise 8: Simple Search
 [View Source Code](https://github.com/beansebrrr/creative-computing/blob/main/introduction-to-programming/assessments/A1-programming-skills-portfolio/08-SimpleSearch.py)
 
-Searching within a *list* made me use *if statements* again. This one is quite simple. I first create a *list* containing different names. I then created the *if statement* which prints out whether the name is present in `nameList`
+Searching within a *list* made me use *if statements* again. This one is quite simple. I first create a *list* containing different names. I then created the *if statement* which prints out whether the name is present in `name_list`. The **Advanced Requirements** made me turn the hard-coded variable `name` into a *user input* so that the user can decide what name to find in `name_list`. Additionally, I eliminated case-sensitiveness just by using `str.capitalize()` on `name`.
 
-The **Advanced Requirements** made me turn the hard-coded variable `name` into a *user input* so that the user can decide what name to find in `nameList`. Additionally, I eliminated case-sensitiveness just by using `str.capitalize()` on `name`.
+To add to my program, I implemented a function `new_name()` to add new names to the list, as well as `print_list` to print out the whole list of names. They can be called by inputting `NEW` or `LIST` respectively. This made the program feel much more complete to me.
 
 ## Exercise 9: Hello
 [View Source Code](https://github.com/beansebrrr/creative-computing/blob/main/introduction-to-programming/assessments/A1-programming-skills-portfolio/09-Hello.py)
