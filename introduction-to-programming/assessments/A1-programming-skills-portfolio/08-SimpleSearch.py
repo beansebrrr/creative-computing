@@ -4,28 +4,67 @@ Exercise 8: Simple Search
 
 Searching lets gooooooo
 """
-nameList = ["jake", "zac", "ian", "ron", "sam", "dave"] # I'll start by creating a list of names.
+# I'll start by creating a list of names.
+name_list = ["Dave", "Ian", "Ron", "Sam", "Jake", "Zac"]
 
-name = input("\nPlease enter a name: ") # For the advanced requirements, I let the user input what name the program should search for.
+# Function to look for name
+def find_name(name):
+    name = name.capitalize()
+    if name in name_list:
+        return True
+    return False
 
-if str.lower(name) in nameList: # If the user's inputted name is within the array of names, it will declare that the name is found.
-    print("\nName Found!\n")
-else:
-    print("\nName does not exist in the list...\n")
+# Extra feature: print all names in the list
+def print_list():
+    name_list.sort()
+    print("\n+-------- List of Names --------+")
+    for j in range(len(name_list)):
+        print(f"{j+1}. {name_list[j]}")
+    print("+-------------------------------+")
+
+# Extra feature: add a new name to the list
+def new_name():
+    name = input("\nWhose name would you like to add? ")
+    name = name.capitalize()
+
+    if find_name(name):
+        print(name, "already exists in the list.")
+    name_list.append(name)
+    print(name, "has been added to the list!")
+
+
+input("""$==========o Namelist o==========$
+    
+Simply enter a name which you'd
+like to look for. You can type
+'NEW' to add a new name to the
+list, or type 'LIST' to show
+the entire list.
+    
+$=====o Hit Enter to begin o=====$""")
+
+while True:
+    name = input("\nFind a name (leave blank to exit): ")
+    if name == 'NEW':
+        new_name()
+        continue
+    elif name == 'LIST':
+        print_list()
+        continue
+    elif name == '':
+        print("Exited the program.")
+        break
+
+    if find_name(name):
+        print(name.capitalize(), "is found in the list!")
+    else:
+        print(name.capitalize(), "is not in the list.")
 
 """
-This was way easier than when I would do this in C.
+Manipulating arrays is very fun
 
-I initially turned the search code into a separate
-function, but after completing it, I realized I didn't
-have to do that. So I just put it back where it belongs.
-
-Additionally, in line 11, I decided to remove
-case-sensitiveness. This led me to set all the names in
-"nameList" to lowercase. If I wanted, I could've also
-changed line 15 into:
-> if str.capitalize(str.lower(name))
-and it would also have removed case-sensitiveness
-without having to manipulate the list. In the end, I
-just settled on the current method.
+I turned the search code into a function. I also
+created a function to add new names to the list,
+as well as a function to print the entire list in
+alphabetical order.
 """
