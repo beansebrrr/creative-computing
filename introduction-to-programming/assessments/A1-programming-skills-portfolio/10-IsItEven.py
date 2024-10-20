@@ -5,16 +5,6 @@ Exercise 10: Is it Even
 int main(void) part 2
 """
 
-def isEven(j):  # Bool function, will explain below.
-    if (j % 2 == 0):
-        return True
-    return False
-
-def isPrime(j):
-    for i in range(2, j):
-        if j % i == 0:
-            return False
-    return True
 
 def main():
     num = input("Please input a number: ")
@@ -34,6 +24,19 @@ def main():
         print(f"{num} is also a Prime number!\n")
     else:
         print(f"{num} is not a Prime number!\n")
+
+
+def isEven(j):  # Bool function, will explain below.
+    if (j % 2 == 0):
+        return True
+    return False
+
+def isPrime(j):
+    for i in range(2, j):
+        if j % i == 0:
+            return False
+    return True
+
 
 if __name__ == "__main__":
     main()

@@ -6,18 +6,6 @@ Here's a quiz about the capitals of different European countries.
 This might be my best work so far.
 """
 
-# This is a separate function to ask the question and
-# check the answers. This is to avoid copy-pasting.
-def ask(country, capital):
-    global score    # Modifies the score variable from outsize the function
-    response = input(f"What is the capital of {country}? ")
-
-    if response.lower() == capital:  # I use an if-else statement in comparing the two strings.
-        print("Correct!\n")             # The 'str.lower' function is used to remove caps-sensitiveness.
-        score += 1
-        return
-    print(f"Wrong. The correct answer is {capital.capitalize()}.\n")   # using 'str.capitalize' for aesthetic purposes
-
 def quiz():
     global score
     score = 0   # Initializing score variable. I'm making a score counter for fun!
@@ -61,6 +49,19 @@ $============o Press Enter to begin. o============$
     else:
         print(f"Aww, you got {score}/10. Let's do better next time!")
 
+
+# This is a separate function to ask the question and
+# check the answers. This is to avoid copy-pasting.
+def ask(country, capital):
+    global score    # Modifies the score variable from outsize the function
+    response = input(f"What is the capital of {country}? ")
+
+    if response.lower() == capital:  # I use an if-else statement in comparing the two strings.
+        print("Correct!\n")             # The 'str.lower' function is used to remove caps-sensitiveness.
+        score += 1
+        return
+    print(f"Wrong. The correct answer is {capital.capitalize()}.\n")   # using 'str.capitalize' for aesthetic purposes
+
 if __name__ == "__main__":
     quiz()
 
@@ -92,5 +93,6 @@ figure out a lot of things.
     searching, I learned that Python creates local variables within functions,
     which was a problem since I was manipulating 'score' inside the 'check'
     function. Luckily, all I had to do was to tell the program to manipulate
-    'score' in a global scope by simply typing "global score" in line 12.
+    'score' in a global scope by simply typing "global score" in line 10 and
+    line 56.
 """
