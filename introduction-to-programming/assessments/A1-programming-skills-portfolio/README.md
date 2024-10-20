@@ -84,7 +84,11 @@ One more requirement for this assessment is to take and complete the [Introducti
 This space is for extra bits of information that I can't find a place for.
 
 ### get_int
-the `input()` function is super useful for when you need, well, user input. One flaw is that it will always return as a *string*, which means I need to prefix `input()` with `int()` to convert *strings* into an *int*, like so:
+
+> [!NOTE]
+> This bit is heavily inspired by [CS50](https://pll.harvard.edu/course/cs50-introduction-computer-science)'s own get_int() function which serves the exact same purpose.
+
+The `input()` function is super useful for when you need, well, user input. One flaw is that it will always return as a *string*, which means I need to prefix `input()` with `int()` to convert *strings* into an *int*, like so:
 ```
 age = int(input("How old are you? "))
 ```
