@@ -150,6 +150,7 @@ I can further shorten this by eliminating the two lines asking for input and mer
 while True:
     try:
         age = int(input("How old are you? "))
+        break
     except ValueError:
         pass
 ```
