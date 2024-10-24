@@ -35,16 +35,14 @@ daysInAMonth = {
     12 : 31}    # December
 
 # Prompts the user for a number of a month.
-month = input("Give me the number of a month (e.g. '1' for January): ")
 
 while True: # Detects for a valid output to avoid errors.
     try:
-        month = int(month)          # Turns the input into an int
+        month = int(input("Give me the number of a month (e.g. '1' for January): "))    # Turns the input into an int
         if (month >= 1 and month <= 12):  # If 'month' is between 1 to 12, exits the loop and continues.
             break
     except ValueError:
-        print("Please type in numbers only, you dummy.")  
-    month = input("Give me the number of a month (e.g. '1' for January): ") # If it doesn't work, reprompts the user.
+        pass    # If it doesn't work, reprompts the user.
 
 # If the month given is 2, therefore february, this part of the
 # code takes leap years into account.
@@ -92,7 +90,7 @@ Oh boy, I have a lot of explaining to do.
 
 2.  After reading about it some more, I found some ways to combat the
     'input()' function's nature of always returning a string. I learned
-    how to use the 'try-except' blocks. See line 40 and line 59. The
+    how to use the 'try-except' blocks. See line 39 and line 57. The
     program will first attempt to turn the user's input into an int,
     but if it returns an error, it skips that and runs the code under
     the 'except' block.

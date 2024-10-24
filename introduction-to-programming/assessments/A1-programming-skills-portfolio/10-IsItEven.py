@@ -7,13 +7,12 @@ int main(void) part 2
 
 
 def main():
-    num = input("Please input a number: ")
     while True: # Converts num into an int, but reprompts if fails.
         try:
-            num = int(num)
+            num = int(input("Please input a number: "))
             break
         except ValueError:
-            num = input("Please input a number: ")
+            pass
     
     if isEven(num):
         print(f"\n{num} is an Even number!")
