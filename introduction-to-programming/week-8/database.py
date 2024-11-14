@@ -3,7 +3,7 @@ Using SQLite3
 """
 
 import sqlite3
-metadb = sqlite3.connect("C://Code//metaverse.db")
+metadb = sqlite3.connect("C://Code//creative-computing//introduction-to-programming//week-8//metaverse.db")
 
 
 def main():
