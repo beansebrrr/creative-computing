@@ -34,7 +34,7 @@ E: Exit
                 print("! Update !")
                 while True:
                     _ = get_id()
-                    if _ == 0:
+                    if _ == None:
                         break
                     update(_)
                     if get_bool("Would you like to update more? ") == False:
@@ -93,7 +93,7 @@ def update(student_id):
 def delete():
     while True:
         student_id = get_id()
-        if student_id == 0:
+        if student_id == None:
             return
         cursor.execute("SELECT name FROM students WHERE id = ?;", str(student_id))
         student_name = cursor.fetchone()[0]
@@ -110,13 +110,19 @@ def delete():
 
 # Only returns a valid id
 def get_id():
-    cursor.execute("SELECT COUNT(*) FROM students;")
-    student_count = cursor.fetchone()[0]
+    cursor.execute("SELECT id FROM students;")
+    retrieve = cursor.fetchall()
+    student_ids = []
+    for id_no in retrieve:
+        student_ids.append(id_no[0])
     # What do you want to update?
     while True:
         update_id = get_int("Please enter the student's ID (0 to exit): ")
-        if update_id in range(student_count + 1):
+        if update_id == 0:
+            return None
+        elif update_id in student_ids:
             break
+        
         print(f"Student with ID {update_id} does not exist in the database.\n")
     return update_id
 
