@@ -4,9 +4,12 @@ Assessment 2: Vending Machine
 """
 
 from pathlib import Path
+from time import sleep
+import os, sqlite3, sys
+
+# This might need to be pip install-ed
 from prettytable import from_db_cursor
-import sqlite3
-import get_utility as g
+
 
 # Root directory
 root_dir = Path(__file__).resolve().parent
@@ -23,16 +26,47 @@ TRANSACTIONS = []
 
 
 def main():
-    view_items()
+    start_screen()
 
     while True:
-        item = get_item_info(get_id())
-        purchase(item)
-        if not g.get_bool("Would you like to make another purchase? "):
-            break
-    
-    print_receipt()
+        main_menu()
+        match input(">>> ").upper():
+            case 'P':
+                make_purchase()
+            case 'A':
+                allowance_top_up()
+            case 'R':
+                restock()
+            case '0':
+                exit_program()
+            case _:
+                pass
 
+# ============= MAIN FUNCTIONS ============= #
+
+def make_purchase():
+    while True:
+        view_items()  
+
+        print(f"\nTransaction #{len(TRANSACTIONS)+1}")
+        if transaction() == None:
+            break
+        if not get_bool("Would you like to buy something else? (y/N): "):
+            break
+
+def allowance_top_up():
+    global CASH
+    while True:
+        try:
+            top_up = round(float(input("How much cash you need? ")), 2)
+            if top_up == 0:
+                break
+        except:
+            continue
+        print("I gotchu man.\n")
+        CASH += top_up
+        sleep(1)
+        break
 
 def view_items():
     cursor.execute("SELECT * FROM items;")
@@ -43,35 +77,63 @@ def view_items():
     print(table)
 
 
-def purchase(item):
+def transaction():
+    while True:
+        item_id = get_id()
+        if item_id == 0:
+            return None
+        
+        item = get_item_info(item_id)
+        if buy(item) == None:
+            continue
+        return 0
+
+
+def buy(item):
     global CASH, TOTAL_SPENT
     if item["stock"] < 1:
         print(f"\n{item["item"]} is out of stock!\n")
-        return
+        return None
     
-    # Check stock of item
-    quantity = g.get_int(f"How many {item["item"]} would you like to purchase? ")
-    if quantity < 1:
-        print(f"\nYou cannot buy less than 1 {item["item"]}.\nTransaction terminated.\n")
-        return
-    elif item["stock"] < quantity:
-        print(f"\nThere are not enough {item["item"]} in stock.\n")
-        return
+    while True:
+        quantity = get_int(f"How many {item["item"]} would you like to purchase? ")
+
+        if quantity == 0:
+            
+            return None
+        elif quantity < 1:
+            print(f"You cannot buy a negative number of {item["item"]}.\n")
+            continue
+        elif item["stock"] < quantity:
+            print(f"There are not enough {item["item"]} in stock.\n")
+            continue
+
+        price = round((item["price"] * quantity), 2)
+        if CASH < price:
+            print(f"\nYou need AED {price:.2f}, but you only have AED {CASH:.2f}.\n")
+            continue
+        break
     
-    # Check if user has enough cash
-    price = round((item["price"] * quantity), 2)
-    if CASH < price:
-        print(f"\nYou need AED {price:.2f}, but you only have AED {CASH:.2f}.\n")
-        return
-    
+    # Update database
     db.execute(f"UPDATE items SET stock = stock - {quantity} WHERE id = ?;", str(item["id"]))
     db.commit()
 
-    # Update cash
+    # Update globals
     CASH -= price
     TOTAL_SPENT += price
-
     update_receipt(item["item"], quantity, price)
+    print("\nPurchase Successful!\n")
+    return True
+
+
+
+
+def restock():
+    db.execute("UPDATE items SET stock = stock + 10;")
+    db.execute("UPDATE items SET stock = 50 WHERE stock > 50;")
+    db.commit()
+    print("The vending machine has been restocked")
+    sleep(1)
 
 
 def update_receipt(name, quantity, price):
@@ -89,17 +151,22 @@ def update_receipt(name, quantity, price):
 
 
 def print_receipt():
+    sys.stdout.write("Printing your receipt")
+    sys.stdout.flush()
+    for i in range(3):
+        sys.stdout.write(".")
+        sys.stdout.flush()
+        sleep(0.5)
+
     print("\n+-----------+ RECEIPT +-----------+\n")
     for transaction in TRANSACTIONS:
         print(f"{transaction["quantity"]} {transaction["name"]}(s) : AED {transaction["price"]:.2f}")
 
-    print(f"Total: {TOTAL_SPENT}")
+    print(f"\nTotal: AED {TOTAL_SPENT:.2f}")
     print("\n+---------------------------------+\n")
 
 
 def get_item_info(item_id):
-    if item_id == 0:
-        quit
     cursor.execute("SELECT * FROM items WHERE id = ?;", str(item_id))
     return dict(cursor.fetchone())
 
@@ -111,16 +178,13 @@ def get_id():
     _rows_ = cursor.fetchall()
     rows = [dict(row) for row in _rows_]
     valid_ids = [id_num for row in rows for id_num in row.values()]
-    valid_ids.append(0)
 
     while True:
-        item_id = g.get_int("Enter item's ID: ")
-        if item_id in valid_ids:
+        item_id = get_int("Enter item's ID: ")
+        if item_id in valid_ids or item_id == 0:
             return item_id
         print("Invalid ID.\n")
 
-
-# o=====================o GENERAL-USE FUNCTIONS o=====================o #
 
 def get_int(prompt) -> int:
     while True:
@@ -138,7 +202,79 @@ def get_bool(prompt) -> bool:
         elif _ in ["n", "no", "false", "f"]:
             return False
 
-def view_allowance():
-    print(f"\nCash onhand: AED {CASH:.2f}\n")
+
+def start_screen():
+    dialogues = [
+        "Need a snack? You've come to the right\nplace!",
+        "I'll get you started with AED 50, but\nif you ever need more, don't be shy.",
+        "Also, you might have to call if you\nneed a restock.",
+        "Lastly, if you have to leave, remember,\nthe magic number is '0'.",
+        "That's all you need to know so... knock\nyourself out.",
+        
+    ]
+
+    for dialogue in dialogues:
+        clear_terminal()
+        print(""" __     __             _ _             
+ \ \   / /__ _ __   __| (_)_ __   __ _ 
+  \ \ / / _ \ '_ \ / _` | | '_ \ / _` |
+   \ V /  __/ | | | (_| | | | | | (_| |
+  __\_/_\___|_| |_|\__,_|_|_| |_|\__, |
+ |  \/  | __ _  ___| |__ (_)_ __ |___/ 
+ | |\/| |/ _` |/ __| '_ \| | '_ \ / _ \\
+ | |  | | (_| | (__| | | | | | | |  __/
+ |_|  |_|\__,_|\___|_| |_|_|_| |_|\___|""")
+        input(f"""
++--------------------------------------+
+{dialogue}
+
+[Click 'Enter' to Continue]
+""")
+    main_menu()
+
+
+def main_menu():
+    clear_terminal()
+    print(f""" __     __             _ _             
+ \ \   / /__ _ __   __| (_)_ __   __ _ 
+  \ \ / / _ \ '_ \ / _` | | '_ \ / _` |
+   \ V /  __/ | | | (_| | | | | | (_| |
+  __\_/_\___|_| |_|\__,_|_|_| |_|\__, |
+ |  \/  | __ _  ___| |__ (_)_ __ |___/ 
+ | |\/| |/ _` |/ __| '_ \| | '_ \ / _ \\
+ | |  | | (_| | (__| | | | | | | |  __/
+ |_|  |_|\__,_|\___|_| |_|_|_| |_|\___|
+
++--------------------------------------+
+ [P] Purchase.
+ [A] Top-up allowance.
+ [R] Restock on goods.
+ [0] Magic number to exit.
++--------------------------------------+
+Amount spent so far: AED {TOTAL_SPENT:.2f}
+Allowance: AED {CASH:.2f}
+""")
+
+
+
+def exit_program():
+    clear_terminal()
+    sys.stdout.write("The vending machine must go")
+    sys.stdout.flush()
+    for i in range(3):
+        sys.stdout.write(".")
+        sys.stdout.flush()
+        sleep(0.5)
+    print("")
+
+    if len(TRANSACTIONS) != 0:
+        print_receipt()
+    else:
+        clear_terminal()
+    quit()
+    
+
+def clear_terminal():
+    os.system("cls" if os.name == "nt" else "clear")
 
 main()
