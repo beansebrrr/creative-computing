@@ -3,12 +3,13 @@ Vince Matthew C. Caballero
 Assessment 2: Vending Machine
 """
 
+from datetime import date
 from pathlib import Path
 from time import sleep
 import os, sqlite3, sys
 
 # This might need to be pip install-ed
-from prettytable import from_db_cursor
+from tabulate import tabulate
 
 
 # Root directory
@@ -23,6 +24,9 @@ cursor = db.cursor()
 CASH = 50.00
 TOTAL_SPENT = 0
 TRANSACTIONS = []
+
+# I'm gonna use this a few times, but this
+# won't be changing
 TITLE = """ __     __             _ _             
  \ \   / /__ _ __   __| (_)_ __   __ _ 
   \ \ / / _ \ '_ \ / _` | | '_ \ / _` |
@@ -61,14 +65,16 @@ def make_purchase():
         view_items()  
 
         print(f"\nTransaction #{len(TRANSACTIONS)+1}")
-        if transaction() == None:
+        if select_item() == None:
             break
         if not get_bool("Would you like to buy something else? (y/N): "):
             break
 
 def allowance_top_up():
     global CASH
-    top_up = get_float("How much you need? ")
+    top_up = get_float("How much do you need? ")
+
+    # Magic number.
     if top_up == 0:
         return
     
@@ -77,6 +83,8 @@ def allowance_top_up():
     sleep(1)
 
 
+# Add 10 to the stock of all items
+# Set a limit of 50.
 def restock():
     db.execute("UPDATE items SET stock = stock + 10;")
     db.execute("UPDATE items SET stock = 50 WHERE stock > 50;")
@@ -86,32 +94,41 @@ def restock():
     sleep(1)
 
 
-
 def view_items():
+    # Retrieve all contents of SQLite database
     cursor.execute("SELECT * FROM items;")
-    table = from_db_cursor(cursor)
+    _ = cursor.fetchall()
+    data = [dict(row) for row in _]
 
-    # Format the price to show 2 decimal values
-    table.float_format = "10.2"
+    # Make all prices a floating-point value
+    for row in data:
+        row["price"] = round(float(row["price"]), 2)
+
+    # Print table
+    table = tabulate(data, headers="keys", floatfmt=".2f", tablefmt="psql")
     print(table)
 
 
-# = TWO PURCHASE FUNCTIONS FOR SOME REASON = #
 # ======= OTHER IMPORTANT FUNCTIONS ======== #
 
-def transaction():
+# 
+def select_item():
     while True:
         item_id = get_id()
 
         # Magic Number
         if item_id == 0:
             return
+        
+        # Proceed with buying, return
+        # True if successful.
         item = get_item_info(item_id)
-        if buy(item) != None:
-            return 0
+        if buy(item) == True:
+            return True
 
 
-# Is the actual function. I don't like nesting humoungously
+# Is the actual purchase function.
+# I don't like nesting humoungously
 def buy(item):
     global CASH, TOTAL_SPENT
     if item["stock"] < 1:
@@ -119,6 +136,7 @@ def buy(item):
         return
     
     while True:
+        # Ask how many to buy
         quantity = get_int(f"How many {item["item"]} would you like to purchase? ")
         price = round((item["price"] * quantity), 2)
                       
@@ -137,15 +155,18 @@ def buy(item):
             print(f"You'd need AED {price:.2f}, but you only have AED {CASH:.2f}.\n")
         else:
             break
-    print(f"\nYou need to put at least AED{price:.2f} in the machine.")
+    print(f"\nYou need to put at least AED {price:.2f} in the machine.")
+    sleep(0.75)
+
     while True:
         # Ask user to insert money
-        insert_cash = get_float("Insert money: ")
-            # Magic Number.
+        insert_cash = get_float("\nInsert money >>> ")
+
+        # Magic Number.
         if insert_cash == 0:
             return
             
-        # Reprompts for insert_cash if not enough money, or too much money
+        # Reprompts for insert_cash if not enough money
         elif insert_cash > CASH:
             print(f"You only have AED {CASH:.2f}.")
         elif insert_cash < price:
@@ -154,7 +175,7 @@ def buy(item):
             break
 
     # Update database
-    db.execute(f"UPDATE items SET stock = stock - {quantity} WHERE id = ?;", str(item["id"]))
+    db.execute(f"UPDATE items SET stock = stock - {quantity} WHERE id = ?;", (item["id"],))
     db.commit()
 
     # Update global 
@@ -163,8 +184,11 @@ def buy(item):
     update_receipt(item["item"], quantity, price)
 
     # Return successfully
-    print(f"\nPurchase Successful!\nYour change: AED {(insert_cash - price):.2f}")
-    return 0
+    print(f"""
+Purchase Successful!
+The machine returned AED {(insert_cash - price):.2f}
+You're now left with AED {CASH:.2f}.""")
+    return True
 
 
 # Keep track of purchased items
@@ -203,7 +227,7 @@ def get_id():
 
 
 def get_item_info(item_id):
-    cursor.execute("SELECT * FROM items WHERE id = ?;", str(item_id))
+    cursor.execute("SELECT * FROM items WHERE id = ?;", (item_id,))
     return dict(cursor.fetchone())
 
 
@@ -221,7 +245,7 @@ def print_receipt():
     for transaction in TRANSACTIONS:
         print(f"{transaction["quantity"]} {transaction["name"]}(s) : AED {transaction["price"]:.2f}")
 
-    print(f"\nTotal: AED {TOTAL_SPENT:.2f}")
+    print(f"\nTotal: AED {TOTAL_SPENT:.2f}\nDate of Purchase: {date.today()}")
     print("\n+---------------------------------+\n")
 
 
@@ -250,7 +274,7 @@ def main_menu():
  [P] Purchase.
  [A] Top-up allowance.
  [R] Restock on goods.
- [0] Magic (get receipt).
+ [0] Magic Number (exit & get receipt).
 +--------------------------------------+
 Amount spent so far: AED {TOTAL_SPENT:.2f}
 Allowance: AED {CASH:.2f}
@@ -273,6 +297,7 @@ def exit_program():
         print_receipt()
     else:
         clear_terminal()
+    sleep(0.5)
     quit()
 
 
