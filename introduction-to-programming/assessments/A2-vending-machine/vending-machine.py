@@ -19,19 +19,20 @@ root_dir = Path(__file__).resolve().parent
 
 # SQLite connection.
 db = sqlite3.connect(root_dir/"vending-machine.db")
+db.row_factory = sqlite3.Row
 cursor = db.cursor()
-
-# Get list of valid IDs before row_factory overcomplicates everything.
-cursor.execute("SELECT id FROM items;")
-valid_ids = [num[0] for num in cursor.fetchall()]
-
-# Row factory makes it possible to return database values with their keys.
-cursor.row_factory = sqlite3.Row
 
 # Global Variables.
 ALLOWANCE = 50.00
 TOTAL_SPENT = 0
 TRANSACTIONS = []
+# Get list of valid IDs
+with sqlite3.connect(root_dir/"vending-machine.db") as temp_conn:
+    global valid_ids
+    temp_cursor = temp_conn.cursor()
+    temp_cursor.execute("SELECT id FROM items;")
+    valid_ids = [num[0] for num in temp_cursor.fetchall()]
+
 
 # I'm gonna use this a few times, but this
 # won't be manipulated.
