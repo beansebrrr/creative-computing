@@ -19,8 +19,14 @@ root_dir = Path(__file__).resolve().parent
 
 # SQLite connection.
 db = sqlite3.connect(root_dir/"vending-machine.db")
-db.row_factory = sqlite3.Row
 cursor = db.cursor()
+
+# Get list of valid IDs before row_factory overcomplicates everything.
+cursor.execute("SELECT id FROM items;")
+valid_ids = [num[0] for num in cursor.fetchall()]
+
+# Row factory makes it possible to return database values with their keys.
+cursor.row_factory = sqlite3.Row
 
 # Global Variables.
 ALLOWANCE = 50.00
@@ -242,12 +248,6 @@ def update_receipt(name, quantity, price):
 
 """Only accept IDs found in vending-machine.db"""
 def get_id():
-    # Get list of valid IDs
-    cursor.execute("SELECT id FROM items;")
-    _ = cursor.fetchall()
-    rows = [dict(row) for row in _]
-    valid_ids = [id_num for row in rows for id_num in row.values()]
-
     # Prompt for a valid ID
     while True:
         item_id = get_int("Enter item's ID: ")
