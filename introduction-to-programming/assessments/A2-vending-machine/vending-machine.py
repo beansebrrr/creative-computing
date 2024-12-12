@@ -4,6 +4,7 @@ Assessment 2: Vending Machine
 """
 
 from datetime import date
+from os import name, system
 from pathlib import Path
 from time import sleep
 import sqlite3
@@ -11,38 +12,42 @@ import sqlite3
 # This might need to be pip install-ed.
 from tabulate import tabulate
 
-# Miscellaneous functions.
-from miscellaneous import *
-
-# Root directory.
+# Get database directory
 root_dir = Path(__file__).resolve().parent
+database = root_dir/"vending-machine.db"
+
+# Check if database exists
+if database.exists() == False:
+    print("Error: No such file as vending-machine.db! Please put vending-machine.py and vending-machine.db in the same folder.")
+    quit()
 
 # SQLite connection.
-db = sqlite3.connect(root_dir/"vending-machine.db")
-db.row_factory = sqlite3.Row
-cursor = db.cursor()
+conn = sqlite3.connect(database)
+conn.row_factory = sqlite3.Row
+cursor = conn.cursor()
 
 # Global Variables.
 ALLOWANCE = 50.00
 TOTAL_SPENT = 0
 TRANSACTIONS = []
-# Get list of valid IDs
-with sqlite3.connect(root_dir/"vending-machine.db") as temp_conn:
+
+# Get list of valid IDs, will be used later on.
+with sqlite3.connect(database) as temp_conn:
     global valid_ids
     temp_cursor = temp_conn.cursor()
     temp_cursor.execute("SELECT id FROM items;")
-    valid_ids = [num[0] for num in temp_cursor.fetchall()]
 
+    valid_ids = [num[0] for num in temp_cursor.fetchall()]
 
 # I'm gonna use this a few times, but this
 # won't be manipulated.
-TITLE = """ __     __             _ _             
+TITLE = r""" __     __             _ _             
  \ \   / /__ _ __   __| (_)_ __   __ _ 
   \ \ / / _ \ '_ \ / _` | | '_ \ / _` |
    \ V /  __/ | | | (_| | | | | | (_| |
   __\_/_\___|_| |_|\__,_|_|_| |_|\__, |
  |  \/  | __ _  ___| |__ (_)_ __ |___/ 
- | |\/| |/ _` |/ __| '_ \| | '_ \ / _ \\
+ | |\/| |/ _` |/ __| '_ \| | '_ \ / _ \
  | |  | | (_| | (__| | | | | | | |  __/
  |_|  |_|\__,_|\___|_| |_|_|_| |_|\___|
 
@@ -87,7 +92,7 @@ def make_purchase():
         print(f"\nTransaction #{len(TRANSACTIONS)+1}")
         while True:
             item_id = get_id()
-
+            # Magic number.
             if item_id == 0:
                 break
 
@@ -95,18 +100,21 @@ def make_purchase():
             if item["stock"] < 1:
                 print(f"{item["name"]} is not in stock!")
                 continue
+            elif item["price"] > ALLOWANCE:
+                print("You don't have enough money to even buy one!")
 
             quantity = get_quantity(item)
-            if quantity == None:
+            # Magic number.
+            if quantity == 0:
                 continue
-
+            
+            # Proceed with buying item. 
             if buy(item, quantity) == True:
                 break
-        
+        # Ask user if they want to do another purchase.
+        # Also, magic number.
         if item_id == 0 or not get_bool("Would you like to buy something else? (y/N): "):
             break
-        # elif not get_bool("Would you like to buy something else? (y/N): "):
-        #     break
 
 
 """Is the actual "buying" part. This is
@@ -117,21 +125,26 @@ def buy(item, quantity):
     while True:
         # Calculate price.
         price = round((item["price"] * quantity), 2)
-        if price < ALLOWANCE:
+        if price <= ALLOWANCE:
             break
         # If too expensive, reprompt for quantity and recalculate price.
         print(f"You need AED {price:,.2f}, but you only have AED {ALLOWANCE:,.2f}.\n")
         quantity = get_quantity(item)
+        # Magic number.
+        if quantity == 0:
+            print("Transaction terminated.\n")
+            return
 
-    # Prompt user to insert money to machine
-    insert = insert_cash(price)
-    if insert == None:
-        print("Transaction terminated.")
+    # Prompt user to pay to machine
+    cash_paid = pay(price)
+    # Magic number.
+    if cash_paid == 0:
+        print("Transaction terminated.\n")
         return 
 
     # Update database
-    db.execute(f"UPDATE items SET stock = stock - {quantity} WHERE id = ?;", (item["id"],))
-    db.commit()
+    conn.execute(f"UPDATE items SET stock = stock - {quantity} WHERE id = ?;", (item["id"],))
+    conn.commit()
 
     # Update globals
     ALLOWANCE -= price
@@ -142,14 +155,9 @@ def buy(item, quantity):
     print("\n+---+ Purchase Successful! +---+\n")
     sleep(0.25)
     
-    print("The machine returned: ", end="", flush=True)
-    sleep(0.25)
-    typewriter(f"AED {(insert - price):,.2f}", 0.075)
+    print_typewriter("The machine returned", f"AED {(cash_paid - price):,.2f}", delay=0.075)
     sleep(0.5)
-
-    print("You're now left with: ", end="", flush=True)
-    sleep(0.25)
-    typewriter(f"AED {ALLOWANCE:,.2f}", 0.075)
+    print_typewriter("Your new allowance", f"AED {ALLOWANCE:,.2f}", delay=0.075)
     return True
 
 
@@ -158,11 +166,8 @@ def get_quantity(item):
     while True:
         # Ask how many to buy
         quantity = get_int(f"How many {item["name"]} would you like to purchase? ")
-        # Magic Number.
-        if quantity == 0:
-            return
         # Stops user from buying if insufficient stock
-        elif quantity < 0:
+        if quantity < 0:
             print(f"You cannot buy {quantity} {item["name"]}(s).\n")
         elif item["stock"] < quantity:
             print(f"There are not enough {item["name"]} in stock.\n")
@@ -171,22 +176,22 @@ def get_quantity(item):
 
 
 """Prompts user to insert money until they add enough"""    
-def insert_cash(price):
-    print(f"\nPlease insert at least AED {price:,.2f} in the machine.")
+def pay(price):
+    typewriter(f"\nPlease pay at least AED {price:,.2f} in the machine.")
     sleep(0.75)
 
     while True:
         # Ask user to insert money
-        insert_cash = get_float("Insert money >>> ")
+        cash = get_float("Insert money >>> ")
 
-        # Reprompts for insert_cash if not enough money
+        # Reprompts for cash if not enough money
         # Also allow user to input 0
-        if insert_cash > ALLOWANCE and insert_cash != 0:
+        if cash > ALLOWANCE and cash != 0:
             print(f"You only have AED {ALLOWANCE:,.2f}.")
-        elif insert_cash < price and insert_cash != 0:
+        elif cash < price and cash != 0:
             print("You did not put enough money.")
         else:
-            return insert_cash
+            return cash
 
 
 """Increase the ALLOWANCE of the user. Has a
@@ -195,24 +200,21 @@ def allowance_top_up():
     global ALLOWANCE
     clear_terminal()
 
-    print("You call your dad to give you more money...\n")
-    print("Dad: ", end="", flush=True)
+    print("You call your dad to give you more money...\n", flush=True)
     sleep(0.25)
-    typewriter("So, how much do you need?", 0.025)
+    print_typewriter("Dad", "So, how much do you need?")
     sleep(0.5)
     top_up = get_float(">>> ")
     # Magic number.
     if top_up == 0:
         return
     
-    print("Dad: ", end="", flush=True)
-    sleep(0.25)
     if top_up >= 70:
-        typewriter("Don't you think that's a little too much?", 0.025, end=" ")
+        print_typewriter("Dad", "Don't you think that's a little too much?", end=" ")
         sleep(0.35)
         typewriter("Well, here you go anyways...", 0.025)
     else:
-        typewriter("Here you go buddy.", 0.025)
+        print_typewriter("Dad", "Here you go buddy.", 0.025)
     
     sleep(0.5)
     ALLOWANCE += top_up
@@ -221,11 +223,22 @@ def allowance_top_up():
 
 """Add 10 to the stock of each item with a limit of 50."""
 def restock():
-    db.execute("UPDATE items SET stock = stock + 10;")
-    db.execute("UPDATE items SET stock = 50 WHERE stock > 50;")
-    db.commit()
+    print("""
+.-------.___
+| ||||| |[_o\_
+| ^^^^^ |- `  )
+'-()------()-
+""", flush=True)
+    
+    sleep(0.5)
+    typewriter("The restock truck has arrived!")
 
-    print("The vending machine has been restocked")
+    conn.execute("UPDATE items SET stock = stock + 10;")
+    conn.execute("UPDATE items SET stock = 50 WHERE stock > 50;")
+    conn.commit()
+    
+    sleep(1)
+    typewriter("The vending machine has been restocked!")
     sleep(1)
 
 
@@ -247,7 +260,7 @@ def update_receipt(name, quantity, price):
         })
 
 
-"""Only accept IDs found in vending-machine.db"""
+"""Only accept IDs found in valid_ids"""
 def get_id():
     # Prompt for a valid ID
     while True:
@@ -296,8 +309,9 @@ def start_screen():
         print(TITLE)
         typewriter(dialogue)
         sleep(0.2)
-        print("\n[Click 'Enter' or type 'SKIP']")
-        if input(">>> ").lower() == "skip":
+        print("\n[Click Enter or type 'SKIP']")
+        # Skip dialogue
+        if input(">>> ").lower() in ["skip", "0"]:
             break
 
 
@@ -305,9 +319,7 @@ def start_screen():
 def exit_program():
     # Emulate a loading sequence
     clear_terminal()
-    print("The vending machine must go", end="", flush="True")
-    sleep(0.5)
-    typewriter("...", 0.5)
+    print_typewriter("The vending machine must go", "...", separator="", delay=0.5)
 
     # Only prints receipt if the user had bought anything
     if len(TRANSACTIONS) > 0:
@@ -321,19 +333,70 @@ def exit_program():
 """Print record of transactions"""
 def print_receipt():
     # Emulates a loading sequence
-    print("Printing your receipt", end="", flush=True)
-    sleep(0.5)
-    typewriter("...", 0.5)
+    print_typewriter("Printing your receipt", "...", separator="", delay=0.5)
 
     # Print all transactions into a receipt
-    print("\n+-----------+ RECEIPT +-----------+\n")
+    print("\n+-------------+ RECEIPT +-------------+\n")
     for transaction in TRANSACTIONS:
         typewriter(f"{transaction["quantity"]} {transaction["name"]}(s) : AED {transaction["price"]:,.2f}")
     
     sleep(0.25)
 
     typewriter(f"\nTotal: AED {TOTAL_SPENT:,.2f}\nDate of Purchase: {date.today()}")
-    print("\n+---------------------------------+\n")
+    print("\n+-------------------------------------+\n")
+
+
+
+
+"""+-------------+ MISCELLANEOUS FUNCTIONS +-------------+"""
+
+"""only allows an int input"""
+def get_int(prompt) -> int:
+    while True:
+        try:
+            return int(input(prompt))
+        except ValueError:
+            pass
+
+
+"""only allows a float input"""
+# Rounded to 2 decimals since we're dealing with money
+def get_float(prompt) -> float:
+    while True:
+        try:
+            return round(float(input(prompt)), 2)
+        except ValueError:
+            pass
+
+
+"""only allows yes or no inputs"""
+def get_bool(prompt) -> bool:
+    while True:
+        _ = input(prompt).lower()
+        if _ in ["y", "yes", "t", "true", "1"]:
+            return True
+        elif _ in ["n", "no", "f", "false", "0"]:
+            return False
+
+
+"""emulate a typewriter effect when printing text"""
+def typewriter(text, delay=0.01, end="\n"):
+    for char in text:
+        print(char, end="", flush=True)
+        sleep(delay)
+    print(end, end="")
+
+
+"""character dialogue, with name and text"""
+def print_typewriter(printed, typewritten, delay=0.025, separator=": ", end="\n"):
+    print(printed, end=separator, flush=True)
+    sleep(0.25)
+    typewriter(typewritten, delay=delay, end=end)
+
+
+"""clears the text from the console"""
+def clear_terminal():
+    system("cls" if name == "nt" else "clear")
 
 
 main()
