@@ -102,6 +102,7 @@ def make_purchase():
                 continue
             elif item["price"] > ALLOWANCE:
                 print("You don't have enough money to even buy one!")
+                continue
 
             quantity = get_quantity(item)
             # Magic number.
@@ -117,8 +118,8 @@ def make_purchase():
             break
 
 
-"""Is the actual "buying" part. This is
-the chonkiest function in the program"""
+"""Is the checkout part. This is the
+chonkiest function in the program"""
 def buy(item, quantity):
     global ALLOWANCE, TOTAL_SPENT
     
@@ -198,7 +199,6 @@ def pay(price):
 little message if the user is a little greedy."""
 def allowance_top_up():
     global ALLOWANCE
-    clear_terminal()
 
     print("You call your dad to give you more money...\n", flush=True)
     sleep(0.25)
@@ -223,7 +223,7 @@ def allowance_top_up():
 
 """Add 10 to the stock of each item with a limit of 50."""
 def restock():
-    print("""
+    print(r"""
 .-------.___
 | ||||| |[_o\_
 | ^^^^^ |- `  )
@@ -251,6 +251,7 @@ def update_receipt(name, quantity, price):
         if name == transaction["name"]:
             transaction["quantity"] += quantity
             transaction["price"] += price
+            return
     # Otherwise add new record
     else:
         TRANSACTIONS.append({
