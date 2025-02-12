@@ -29,7 +29,9 @@ function draw() {
   // door
   doorWidth = 50
   fill(87, 75, 68)
-  rect(400/2-doorWidth/2, 400/2, doorWidth, squareSize/2)
+  rect(
+    400/2-doorWidth/2, 400/2,
+    doorWidth, squareSize/2)
 
   // doorknob
   fill("gold")
