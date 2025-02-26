@@ -1,0 +1,32 @@
+*,
+*::after,
+*::before {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+.heroContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-inline: 20%;
+}
+
+.displayPhoto {
+  width: 24rem;
+}
+
+.heroText {
+  flex: 1;
+  background-color: #bbbbff;
+  padding-block: 1rem;
+}
+
+.mainText, .mainSubtitle {
+  margin: 0;
+}
