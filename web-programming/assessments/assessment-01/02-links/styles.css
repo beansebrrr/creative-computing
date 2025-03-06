@@ -1,0 +1,51 @@
+*,
+*::after,
+*::before {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  min-height: 200vh;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(#00ffb3, #29caff);
+}
+
+header {
+  background-color: #f0f8ffaa;
+  position: sticky;
+  top: 0;
+  backdrop-filter: blur(16px);
+  box-shadow: #0003 0 2px 2rem 1rem;
+}
+
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+}
+
+nav #logo {
+  height: 5rem;
+  transition: height 300ms ease;
+}
+
+.nav-list {
+  list-style-type: none;
+  display: flex;
+  margin: 0;
+  padding: 0;
+  gap: 1.5rem;
+}
+
+.nav-list a {
+  text-decoration: none;
+  color: #000;
+  transition: opacity 200ms linear;
+}
+
+.nav-list a:hover {
+  opacity: 0.7;
+}
