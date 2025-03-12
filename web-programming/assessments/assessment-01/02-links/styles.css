@@ -1,3 +1,8 @@
+@font-face {
+  font-family: 'Metamorphous';
+  src: url(./fonts/metamorphous-v20-latin-regular.woff2);
+}
+
 *,
 *::after,
 *::before {
@@ -12,10 +17,10 @@
 
 body {
   font-family: Arial, sans-serif;
-  min-height: 200vh;
+  min-height: 100vh;
   margin: 0;
   padding: 0;
-  background: linear-gradient(#6a9eff, #dc74ff);
+  background: linear-gradient(#6a9eff, #74ffb3);
 }
 
 header {
@@ -35,8 +40,11 @@ nav {
 }
 
 nav #logo {
-  height: 5rem;
-  transition: height 300ms ease;
+  font-family: 'Metamorphous', 'Times New Roman', Times, serif;
+  font-size: 2rem;
+  color: #ffffff;
+  text-decoration: none;
+  transition: font-size 300ms ease;
   user-select: none;
 }
 
@@ -61,36 +69,42 @@ nav #logo {
 main {
   margin: 2rem min(10rem, 8%);
   display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap-reverse;
+  flex-direction: column;
+  gap: 2rem;
 }
 
-main article {
+section {
+  width: 100%;
+  gap: 1rem;
+  display: grid;
+  place-items: center;
+}
+
+section h1, section h2 {
+  margin-top: 0;
+}
+
+section article {
   background-color: #f0f8ff33;
   backdrop-filter: blur(16px);
   box-shadow: #0002 0 2px 1rem 0.5rem;
   padding: min(2rem, 5%);
   border-radius: 8px;
-  width: min(60ch, 100%);
+  width: 60ch;
   height: 100%;
 }
 
-.trailer-container {
+#char-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(25rem, 1fr));
+  place-items: center;
+}
+
+.char-card {
   background-color: #f0f8ff33;
   backdrop-filter: blur(16px);
   box-shadow: #0002 0 2px 1rem 0.5rem;
+  padding: min(2rem, 5%);
   border-radius: 8px;
-  padding: 0.5rem;
-  display: grid;
-  align-self: center;
-  flex: 1;
-  min-width: 30rem;
-}
-
-#trailer {
-  border-radius: 6px;
-  width: 100%;
-  aspect-ratio: 16/9;
+  height: 100%;
 }
