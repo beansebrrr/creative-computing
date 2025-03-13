@@ -11,6 +11,10 @@ body {
   padding: 0;
 }
 
+h1 {
+  text-align: center;
+}
+
 .cat-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 30%));
