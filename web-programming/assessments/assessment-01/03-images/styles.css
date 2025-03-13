@@ -1,0 +1,29 @@
+*,
+*::after,
+*::before {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  max-width: 100vw;
+  margin: 0;
+  padding: 0;
+}
+
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 30%));
+  gap: 1rem;
+}
+
+figure,
+figure * {
+  width: 100%;
+}
+
+.filter-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+}
