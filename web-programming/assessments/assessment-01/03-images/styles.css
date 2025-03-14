@@ -73,6 +73,7 @@ nav ul * {
   place-items: start center;
 }
 
+/* remove default margins */
 figure {
   margin: 0;
 }
@@ -86,6 +87,7 @@ figure {
 
 /****** BONUS SECTION ******/
 
+/* base styles */
 .styled-div {
   font-size: 1.5rem;
   border: 4px solid black;
